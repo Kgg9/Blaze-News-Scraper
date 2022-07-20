@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="Back-Arrow">
+    <file>left-arrow.png</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="MainWindowBackground" native="true">
+   <property name="geometry">
+    <rect>
+     <x>-1</x>
+     <y>-1</y>
+     <width>501</width>
+     <height>801</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QWidget#MainWindowBackground{
+background-color: black;}</string>
+   </property>
+   <widget class="QLabel" name="Title">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>40</y>
+      <width>301</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Cascadia Mono ExtraLight</family>
+      <pointsize>48</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255)</string>
+    </property>
+    <property name="text">
+     <string>Blazer</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="MainWindowLogo">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>40</y>
+      <width>121</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/Logo/blaze.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ScraperPushButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>280</y>
+      <width>321</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Cascadia Code Light</family>
+      <pointsize>24</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+background-color: black;
+color: white;
+}
+
+QPushButton:hover{
+border-style: solid;
+border-width:2px;
+border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255,154,139,1), stop:1 rgba(255,106,136,1));
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Scraper</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PosterPushButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>370</y>
+      <width>321</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Cascadia Code Light</family>
+      <pointsize>24</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+background-color: black;
+color: white;
+}
+
+QPushButton:hover{
+border-style: solid;
+border-width:2px;
+border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255,154,139,1), stop:1 rgba(255,106,136,1));
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Poster</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="QueuedPushButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>460</y>
+      <width>321</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Cascadia Code Light</family>
+      <pointsize>24</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+background-color: black;
+color: white;
+}
+
+QPushButton:hover{
+border-style: solid;
+border-width:2px;
+border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255,154,139,1), stop:1 rgba(255,106,136,1));
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Queued</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="AccountsPushButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>550</y>
+      <width>321</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Cascadia Code Light</family>
+      <pointsize>24</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+background-color: black;
+color: white;
+}
+
+QPushButton:hover{
+border-style: solid;
+border-width:2px;
+border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255,154,139,1), stop:1 rgba(255,106,136,1));
+}
+</string>
+    </property>
+    <property name="text">
+     <string>Accounts</string>
+    </property>
+   </widget>
+   <zorder>Title</zorder>
+   <zorder>MainWindowLogo</zorder>
+   <zorder>PosterPushButton</zorder>
+   <zorder>QueuedPushButton</zorder>
+   <zorder>AccountsPushButton</zorder>
+   <zorder>ScraperPushButton</zorder>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../Images/Logo.qrc"/>
+ </resources>
+ <connections/>
+</ui>
