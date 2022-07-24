@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1500</width>
-    <height>800</height>
+    <width>1535</width>
+    <height>796</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,9 +39,9 @@ background-color: rgb(99, 110, 114);
   <widget class="QTabWidget" name="PosterTab">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>30</x>
      <y>160</y>
-     <width>1481</width>
+     <width>1461</width>
      <height>581</height>
     </rect>
    </property>
@@ -49,6 +49,46 @@ background-color: rgb(99, 110, 114);
     <number>-1</number>
    </property>
   </widget>
+  <widget class="QWidget" name="SecondaryBackgroundPoster" native="true">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>150</y>
+     <width>1481</width>
+     <height>601</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(127, 155, 212, 1);
+border-radius:10px;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>40</y>
+     <width>291</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Cascadia Mono Light</family>
+     <pointsize>48</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color:white;</string>
+   </property>
+   <property name="text">
+    <string>Poster</string>
+   </property>
+  </widget>
+  <zorder>SecondaryBackgroundPoster</zorder>
+  <zorder>PosterBackArrowLabel</zorder>
+  <zorder>PosterTab</zorder>
+  <zorder>label</zorder>
  </widget>
  <resources>
   <include location="../Images/Back-Arrow.qrc"/>

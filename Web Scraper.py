@@ -17,7 +17,6 @@ headers = ["Title",
            "Link",
            "Twitter",
            "Linkedin",
-           "Queue"
            ]
 
 class MainWindow(QDialog):
@@ -35,7 +34,7 @@ class MainWindow(QDialog):
         widget.setCurrentIndex(widget.currentIndex()+1)
 
     def PosterPage(self):
-        widget.setFixedSize(1500, 800)
+        widget.setFixedSize(1523, 796)
         widget.setCurrentIndex(widget.currentIndex() + 2)
 
 
@@ -56,6 +55,7 @@ class ScraperMainWindow(QDialog):
 
         self.ScrapePushButton.clicked.connect(self.scrapeButton)
 
+
     def mainPage(self, event):
         self.event = widget.setFixedSize(500, 800)
         self.event = widget.setCurrentIndex(widget.currentIndex() -1 )
@@ -68,6 +68,7 @@ class ScraperMainWindow(QDialog):
             self.ScraperErrorMessage.hide()
             self.progressBar.show()
 
+            self.clearTabs()
 
             keywords = self.ScrapeLineEdit.text().split(',')
             pages = self.ScraperSpinBox.value()
@@ -81,9 +82,15 @@ class ScraperMainWindow(QDialog):
             self.googleRun.pages = pages
             self.googleRun.time = time
             self.googleRun.baseurl = baseUrlGoogle
+            self.ThreadActive = True
 
             self.googleRun.start()
-            self.googleRun.finish.connect(self.scrapingFinshed)
+
+            self.googleRun.data.connect(self.scrapingFinshed)
+            self.googleRun.ThreadActive.connect(self.posterPage)
+            self.googleRun.ThreadActive.connect(self.posterPageAfter)
+
+
 
     def scrapingFinshed(self, newsArticles, keyword):
         self.poster = widget.widget(widget.currentIndex()+1)
@@ -102,8 +109,6 @@ class ScraperMainWindow(QDialog):
 
         tPixmap = QPixmap("Images/twitter.png")
         lPixmap = QPixmap("Images/linkedin.png")
-        cPixmap = QPixmap("Images/schedule.png")
-
 
         for i in range(len(self.data)):
             self.Twitter = QLabel()
@@ -114,24 +119,48 @@ class ScraperMainWindow(QDialog):
             self.Linkedin.setPixmap(lPixmap)
             self.Linkedin.setAlignment(Qt.AlignCenter)
 
-            self.Calender = QLabel()
-            self.Calender.setPixmap(cPixmap)
-            self.Calender.setAlignment(Qt.AlignCenter)
-
             self.table.setItem(i, 0, QTableWidgetItem(self.data[i][0]))
             self.table.setItem(i, 1, QTableWidgetItem(self.data[i][1]))
             self.table.setItem(i, 2, QTableWidgetItem(self.data[i][2]))
             self.table.setItem(i, 3, QTableWidgetItem(self.data[i][3]))
             self.table.setCellWidget(i, 4, self.Twitter)
             self.table.setCellWidget(i, 5, self.Linkedin)
-            self.table.setCellWidget(i, 6, self.Calender)
-
 
         self.table.resizeColumnsToContents()
         return self.table
 
+    def posterPage(self):
+        self.progressBar.hide()
+        widget.setFixedSize(1523, 796)
+        widget.setCurrentIndex(widget.currentIndex() + 1)
 
 
+
+    def clearTabs(self):
+        self.poster = widget.widget(widget.currentIndex() + 1)
+        self.tab = self.poster.findChild(QTabWidget, "PosterTab")
+
+        totalTabs = self.tab.count()
+
+        for i in range(totalTabs):
+            self.tab.removeTab(0)
+
+    def posterPageAfter(self):
+
+        self.poster = widget.widget(widget.currentIndex())
+        self.tab = self.poster.findChild(QTabWidget, "PosterTab")
+
+        for i in range(self.tab.count()):
+            self.tab.widget(i).cellClicked.connect(self.currentColumn)
+
+
+    def currentColumn(self,row,column):
+
+        if column == headers.index("Twitter"):
+            self.Twitter = TwitterPosterWindow()
+            title = self.tab.widget(self.tab.currentIndex()).item(row,1).text()
+            print(title)
+            self.Twitter.show()
 
 
 class PosterWindow(QDialog):
@@ -139,17 +168,30 @@ class PosterWindow(QDialog):
         super(PosterWindow, self).__init__()
         loadUi('Windows/PosterMainWindow.ui',self)
 
-        self.setFixedSize(self.width(),self.height())
-
         self.PosterBackArrowLabel.setPixmap(QPixmap('Images/left-arrow.png'))
 
         self.PosterBackArrowLabel.mousePressEvent = self.mainPage
+
 
     def mainPage(self, event):
         self.event = widget.setFixedSize(500, 800)
         self.event = widget.setCurrentIndex(widget.currentIndex() - 2)
 
 
+class TwitterPosterWindow(QDialog):
+    def __init__(self):
+        super(TwitterPosterWindow, self).__init__()
+        loadUi('Windows/TwitterPoster.ui',self)
+
+        self.DateTimeEditTwiter.hide()
+
+        self.QueueTwitterRadioButton.toggled.connect(self.check)
+
+    def check(self,enabled):
+        if enabled:
+            self.DateTimeEditTwiter.show()
+        else:
+            self.DateTimeEditTwiter.hide()
 
 
 class searchEngineThread(QThread):
@@ -158,13 +200,18 @@ class searchEngineThread(QThread):
     pages = pyqtSignal(str)
     time = pyqtSignal(str)
     baseurl = pyqtSignal(str)
-    finish = pyqtSignal(list, str)
+    data = pyqtSignal(list, str)
+    ThreadActive = pyqtSignal(bool)
+
+
 
     def run(self):
         for keyword in self.keywords:
             googleSE = Google(self.time, keyword, self.pages, self.baseurl)
             googleSE = googleSE.Start()
-            self.finish.emit(googleSE, keyword)
+            self.data.emit(googleSE, keyword)
+        self.ThreadActive.emit(False)
+
 
 
 

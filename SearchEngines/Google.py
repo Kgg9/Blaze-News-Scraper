@@ -78,7 +78,7 @@ class Google():
         for i in range(pages):
             try:
                 newsArticles.append(self.news_Scraper(self.driver.page_source))
-                next_Icon = WebDriverWait(self.driver, 0.5).until(
+                next_Icon = WebDriverWait(self.driver, 1).until(
                     EC.presence_of_element_located((By.ID, "pnnext"))
                 )
                 next_Icon.click()
