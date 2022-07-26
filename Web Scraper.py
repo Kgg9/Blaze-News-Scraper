@@ -155,12 +155,19 @@ class ScraperMainWindow(QDialog):
 
 
     def currentColumn(self,row,column):
+        title = self.tab.widget(self.tab.currentIndex()).item(row, headers.index("Title")).text()
+        description = self.tab.widget(self.tab.currentIndex()).item(row, headers.index("Description")).text()
+        link = self.tab.widget(self.tab.currentIndex()).item(row, headers.index("Link")).text()
 
         if column == headers.index("Twitter"):
             self.Twitter = TwitterPosterWindow()
-            title = self.tab.widget(self.tab.currentIndex()).item(row,1).text()
-            print(title)
+            self.Twitter.PosterTwitter.setPlainText(f"{title}\n\n{link}")
             self.Twitter.show()
+
+        if column == headers.index("Linkedin"):
+            self.Linkedin = LinkedinPosterWindow()
+            self.Linkedin.PosterLinkedin.setPlainText(f"{title}\n\n{description}\n\n{link}")
+            self.Linkedin.show()
 
 
 class PosterWindow(QDialog):
@@ -185,14 +192,35 @@ class TwitterPosterWindow(QDialog):
 
         self.DateTimeEditTwiter.hide()
 
-        self.QueueTwitterRadioButton.toggled.connect(self.check)
+        self.QueueTwitterRadioButton.toggled.connect(self.dateTimeCheckTwitt)
 
-    def check(self,enabled):
+        self.PosterTwitter.textChanged.connect(self.characterCounter)
+
+    def dateTimeCheckTwitt(self,enabled):
         if enabled:
             self.DateTimeEditTwiter.show()
         else:
             self.DateTimeEditTwiter.hide()
 
+    def characterCounter(self):
+        characters = len(self.PosterTwitter.toPlainText())
+        self.TwitterCharacterCounter.setText(f"{characters}/288")
+
+
+class LinkedinPosterWindow(QDialog):
+    def __init__(self):
+        super(LinkedinPosterWindow, self).__init__()
+        loadUi('Windows/LinkedinPoster.ui', self)
+
+        self.DateTimeEditLinkedin.hide()
+
+        self.QueueLinkedinRadioButton.toggled.connect(self.dateTimecheckLink)
+
+    def dateTimecheckLink(self, enabled):
+        if enabled:
+            self.DateTimeEditLinkedin.show()
+        else:
+            self.DateTimeEditLinkedin.hide()
 
 class searchEngineThread(QThread):
 
@@ -213,20 +241,6 @@ class searchEngineThread(QThread):
         self.ThreadActive.emit(False)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app = QApplication(sys.argv)
 
 widget = QtWidgets.QStackedWidget()
@@ -238,11 +252,6 @@ widget.addWidget(scraperWindow)
 widget.addWidget(posterWindow)
 widget.setFixedSize(500,800)
 widget.show()
-
-#
-# for keyword in keywords:
-#     googleSE = Google(time,keyword,10,url)
-#     GetCSV.get_CSV(googleSE.Start(),keyword,time)
 
 try:
     sys.exit(app.exec())
