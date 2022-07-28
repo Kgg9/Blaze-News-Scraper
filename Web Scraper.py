@@ -1,4 +1,3 @@
-
 # Imports needed to make the project run
 import sys
 from SearchEngines.Google import Google
@@ -11,6 +10,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import*
 
 baseUrlGoogle = "https://www.google.com/search?q=&source=lnms&tbm=nws"
+
 headers = ["Title",
            "Description",
            "Publication Date (Relative To When Scraper Was Run)",
@@ -18,6 +18,9 @@ headers = ["Title",
            "Twitter",
            "Linkedin",
            ]
+
+linkedinLogin = []
+twitterLogin = []
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -28,22 +31,25 @@ class MainWindow(QDialog):
 
         self.ScraperPushButton.clicked.connect(self.ScrapperPage)
         self.PosterPushButton.clicked.connect(self.PosterPage)
+        self.AccountsPushButton.clicked.connect(self.AccountsPage)
 
     def ScrapperPage(self):
-        widget.setFixedSize(600,800)
+        widget.setFixedSize(scraperWidth,scraperHeight)
         widget.setCurrentIndex(widget.currentIndex()+1)
 
     def PosterPage(self):
-        widget.setFixedSize(1523, 796)
+        widget.setFixedSize(posterWidth,posterHeight)
         widget.setCurrentIndex(widget.currentIndex() + 2)
+
+    def AccountsPage(self):
+        widget.setFixedSize(accountsWidth,accountsHeight)
+        widget.setCurrentIndex(widget.currentIndex()+3)
 
 
 class ScraperMainWindow(QDialog):
     def __init__(self):
         super(ScraperMainWindow, self).__init__()
         loadUi('Windows/ScraperMainWindow.ui',self)
-
-
 
         self.BackArrowLabel.setPixmap(QPixmap('Images/left-arrow.png'))
         self.BackArrowLabel.mousePressEvent = self.mainPage
@@ -57,7 +63,7 @@ class ScraperMainWindow(QDialog):
 
 
     def mainPage(self, event):
-        self.event = widget.setFixedSize(500, 800)
+        self.event = widget.setFixedSize(mainWidth,mainHeight)
         self.event = widget.setCurrentIndex(widget.currentIndex() -1 )
 
     def scrapeButton(self):
@@ -135,7 +141,6 @@ class ScraperMainWindow(QDialog):
         widget.setCurrentIndex(widget.currentIndex() + 1)
 
 
-
     def clearTabs(self):
         self.poster = widget.widget(widget.currentIndex() + 1)
         self.tab = self.poster.findChild(QTabWidget, "PosterTab")
@@ -181,9 +186,21 @@ class PosterWindow(QDialog):
 
 
     def mainPage(self, event):
-        self.event = widget.setFixedSize(500, 800)
+        self.event = widget.setFixedSize(mainWidth,mainHeight)
         self.event = widget.setCurrentIndex(widget.currentIndex() - 2)
 
+
+class Accounts(QDialog):
+    def __init__(self):
+        super(Accounts, self).__init__()
+        loadUi('Windows/Accounts.ui',self)
+
+        self.LinkedinBackArrowLabel.setPixmap(QPixmap('Images/left-arrow.png'))
+        self.LinkedinBackArrowLabel.mousePressEvent = self.mainPage
+
+    def mainPage(self,event):
+        self.event = widget.setFixedSize(mainWidth,mainHeight)
+        self.event = widget.setCurrentIndex(widget.currentIndex() - 3)
 
 class TwitterPosterWindow(QDialog):
     def __init__(self):
@@ -231,8 +248,6 @@ class searchEngineThread(QThread):
     data = pyqtSignal(list, str)
     ThreadActive = pyqtSignal(bool)
 
-
-
     def run(self):
         for keyword in self.keywords:
             googleSE = Google(self.time, keyword, self.pages, self.baseurl)
@@ -244,13 +259,31 @@ class searchEngineThread(QThread):
 app = QApplication(sys.argv)
 
 widget = QtWidgets.QStackedWidget()
+
 mainWindow = MainWindow()
 scraperWindow = ScraperMainWindow()
 posterWindow = PosterWindow()
+accounts = Accounts()
+
 widget.addWidget(mainWindow)
 widget.addWidget(scraperWindow)
 widget.addWidget(posterWindow)
-widget.setFixedSize(500,800)
+widget.addWidget(accounts)
+
+mainWidth = mainWindow.width()
+mainHeight = mainWindow.height()
+
+scraperWidth = scraperWindow.width()
+scraperHeight = scraperWindow.height()
+
+posterWidth = posterWindow.width()
+posterHeight = posterWindow.height()
+
+accountsWidth = accounts.width()
+accountsHeight = accounts.height()
+
+widget.setFixedSize(mainWidth,mainHeight)
+
 widget.show()
 
 try:
