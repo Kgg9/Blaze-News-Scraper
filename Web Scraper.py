@@ -137,7 +137,7 @@ class ScraperMainWindow(QDialog):
 
     def posterPage(self):
         self.progressBar.hide()
-        widget.setFixedSize(1523, 796)
+        widget.setFixedSize(posterWidth, posterHeight)
         widget.setCurrentIndex(widget.currentIndex() + 1)
 
 
