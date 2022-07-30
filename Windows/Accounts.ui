@@ -210,6 +210,35 @@ background-color: rgb(89,96,156);
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/BackArrow/left-arrow.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="AccountsErrorMessage">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>780</y>
+     <width>731</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Cascadia Code SemiBold</family>
+     <pointsize>14</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+border:none;
+background-color: none;
+color: red;
+}
+</string>
+   </property>
+   <property name="text">
+    <string>Error Please Make Sure All Required Fields Are Completed</string>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="../Images/Back-ArrowAccounts.qrc"/>

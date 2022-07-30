@@ -1,12 +1,12 @@
 # Imports needed to make the project run
 import sys
 from SearchEngines.Google import Google
-from Tools import GetCSV
+from Tools.LinkedinAccountPost import LinkedinAccountPoster
 import Images
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QColor
 from PyQt5.QtCore import*
 
 baseUrlGoogle = "https://www.google.com/search?q=&source=lnms&tbm=nws"
@@ -195,12 +195,27 @@ class Accounts(QDialog):
         super(Accounts, self).__init__()
         loadUi('Windows/Accounts.ui',self)
 
+        self.AccountsErrorMessage.hide()
+
         self.LinkedinBackArrowLabel.setPixmap(QPixmap('Images/left-arrow.png'))
         self.LinkedinBackArrowLabel.mousePressEvent = self.mainPage
+
+        self.LinkedinSaveButton.clicked.connect(self.linkAccountInfo)
 
     def mainPage(self,event):
         self.event = widget.setFixedSize(mainWidth,mainHeight)
         self.event = widget.setCurrentIndex(widget.currentIndex() - 3)
+
+    def linkAccountInfo(self):
+        self.AccountsErrorMessage.hide()
+
+        linkedinLogin.append(self.LinkedinUsernameBox.text())
+        linkedinLogin.append(self.LinkedinPasswordBox.text())
+        linkedinLogin.append(self.LinkedinCompanyUrlBox.text())
+
+        if "" in linkedinLogin:
+            self.AccountsErrorMessage.show()
+            linkedinLogin.clear()
 
 class TwitterPosterWindow(QDialog):
     def __init__(self):
@@ -232,12 +247,35 @@ class LinkedinPosterWindow(QDialog):
         self.DateTimeEditLinkedin.hide()
 
         self.QueueLinkedinRadioButton.toggled.connect(self.dateTimecheckLink)
+        self.LinkedinPosterButton.clicked.connect(self.postLinkedin)
 
     def dateTimecheckLink(self, enabled):
         if enabled:
             self.DateTimeEditLinkedin.show()
         else:
             self.DateTimeEditLinkedin.hide()
+
+    def postLinkedin(self):
+
+        self.linkPostRun = LinkedinPosterMech(self.PosterLinkedin.toPlainText())
+
+        self.linkPostRun.start()
+        self.linkPostRun.finished.connect(self.linkPostRunAfter)
+
+    def linkPostRunAfter(self):
+        self.poster = widget.widget(widget.currentIndex())
+        self.tab = self.poster.findChild(QTabWidget, "PosterTab")
+
+
+        currentTab = self.tab.currentIndex()
+        currentRow = self.tab.widget(currentTab).currentRow()
+
+        for i in range(len(headers)-2):
+            self.tab.widget(currentTab).item(currentRow,i).setBackground(QColor("Yellow"))
+
+        self.tab.widget(currentTab).cellWidget(currentRow, headers.index("Linkedin")).setStyleSheet("background-color:Yellow")
+
+        self.close()
 
 class searchEngineThread(QThread):
 
@@ -254,6 +292,20 @@ class searchEngineThread(QThread):
             googleSE = googleSE.Start()
             self.data.emit(googleSE, keyword)
         self.ThreadActive.emit(False)
+
+class LinkedinPosterMech(QThread):
+
+    def __init__(self,textData):
+        super().__init__()
+
+        self.username = linkedinLogin[0]
+        self.password = linkedinLogin[1]
+        self.companyUrl = linkedinLogin[2]
+        self.textData = textData
+
+    def run(self):
+        linkPost = LinkedinAccountPoster(self.username,self.password,self.companyUrl,self.textData)
+        linkPost.linkedinRun()
 
 
 app = QApplication(sys.argv)
