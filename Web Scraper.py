@@ -209,13 +209,14 @@ class Accounts(QDialog):
     def linkAccountInfo(self):
         self.AccountsErrorMessage.hide()
 
+        linkedinLogin.clear()
+
         linkedinLogin.append(self.LinkedinUsernameBox.text())
         linkedinLogin.append(self.LinkedinPasswordBox.text())
         linkedinLogin.append(self.LinkedinCompanyUrlBox.text())
 
         if "" in linkedinLogin:
             self.AccountsErrorMessage.show()
-            linkedinLogin.clear()
 
 class TwitterPosterWindow(QDialog):
     def __init__(self):

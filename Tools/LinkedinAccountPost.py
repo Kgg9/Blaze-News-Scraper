@@ -39,7 +39,11 @@ class LinkedinAccountPoster():
         postBox = self.driver.find_element(By.CLASS_NAME,'ql-editor.ql-blank')
         postBox.send_keys(self.postData)
 
+        sleep(2)
+
+        self.driver.find_element(By.XPATH, "//button[contains(@class, 'share-actions__primary-action artdeco-button artdeco-button--2 artdeco-button--primary ember-view') and contains(., 'Post')]").click()
 
     def linkedinRun(self):
         self.login()
         self.postCompanyPage()
+
