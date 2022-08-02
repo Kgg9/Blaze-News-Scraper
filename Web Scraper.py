@@ -2,6 +2,7 @@
 import sys
 from SearchEngines.Google import Google
 from Tools.LinkedinAccountPost import LinkedinAccountPoster
+from Tools.TwitterAccountPost import TwitterAccountPost
 import Images
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets, QtGui
@@ -44,6 +45,7 @@ class MainWindow(QDialog):
     def AccountsPage(self):
         widget.setFixedSize(accountsWidth,accountsHeight)
         widget.setCurrentIndex(widget.currentIndex()+3)
+        widget.findChild(QPushButton,'AccountsErrorMessage').hide()
 
 
 class ScraperMainWindow(QDialog):
@@ -195,12 +197,11 @@ class Accounts(QDialog):
         super(Accounts, self).__init__()
         loadUi('Windows/Accounts.ui',self)
 
-        self.AccountsErrorMessage.hide()
-
-        self.LinkedinBackArrowLabel.setPixmap(QPixmap('Images/left-arrow.png'))
-        self.LinkedinBackArrowLabel.mousePressEvent = self.mainPage
+        self.AccountsBackArrowLabel.setPixmap(QPixmap('Images/left-arrow.png'))
+        self.AccountsBackArrowLabel.mousePressEvent = self.mainPage
 
         self.LinkedinSaveButton.clicked.connect(self.linkAccountInfo)
+        self.TwitterSaveButton.clicked.connect(self.tweetAccountInfo)
 
     def mainPage(self,event):
         self.event = widget.setFixedSize(mainWidth,mainHeight)
@@ -218,6 +219,18 @@ class Accounts(QDialog):
         if "" in linkedinLogin:
             self.AccountsErrorMessage.show()
 
+    def tweetAccountInfo(self):
+        self.AccountsErrorMessage.hide()
+
+        twitterLogin.clear()
+
+        twitterLogin.append(self.TwitterUsernameBox.text())
+        twitterLogin.append(self.TwitterPasswordBox.text())
+
+        if "" in twitterLogin:
+            self.AccountsErrorMessage.show()
+
+
 class TwitterPosterWindow(QDialog):
     def __init__(self):
         super(TwitterPosterWindow, self).__init__()
@@ -229,6 +242,8 @@ class TwitterPosterWindow(QDialog):
 
         self.PosterTwitter.textChanged.connect(self.characterCounter)
 
+        self.TwitterPosterButton.clicked.connect(self.postTwitter)
+
     def dateTimeCheckTwitt(self,enabled):
         if enabled:
             self.DateTimeEditTwiter.show()
@@ -238,6 +253,28 @@ class TwitterPosterWindow(QDialog):
     def characterCounter(self):
         characters = len(self.PosterTwitter.toPlainText())
         self.TwitterCharacterCounter.setText(f"{characters}/288")
+
+    def postTwitter(self):
+        self.twitterPostRun = TwitterPosterMech(self.PosterTwitter.toPlainText())
+
+        self.twitterPostRun.start()
+
+        self.twitterPostRun.finished.connect(self.tweetPostRunAfter)
+
+    def tweetPostRunAfter(self):
+        self.poster = widget.widget(widget.currentIndex())
+        self.tab = self.poster.findChild(QTabWidget, "PosterTab")
+
+        currentTab = self.tab.currentIndex()
+        currentRow = self.tab.widget(currentTab).currentRow()
+
+        for i in range(len(headers) - 2):
+            self.tab.widget(currentTab).item(currentRow, i).setBackground(QColor("Yellow"))
+
+        self.tab.widget(currentTab).cellWidget(currentRow, headers.index("Twitter")).setStyleSheet(
+            "background-color:Yellow")
+
+        self.close()
 
 
 class LinkedinPosterWindow(QDialog):
@@ -308,6 +345,17 @@ class LinkedinPosterMech(QThread):
         linkPost = LinkedinAccountPoster(self.username,self.password,self.companyUrl,self.textData)
         linkPost.linkedinRun()
 
+class TwitterPosterMech(QThread):
+    def __init__(self, textData):
+        super().__init__()
+
+        self.username = twitterLogin[0]
+        self.password = twitterLogin[1]
+        self.textData = textData
+
+    def run(self):
+        tweetPost = TwitterAccountPost(self.username,self.password,self.textData)
+        tweetPost.postTweet()
 
 app = QApplication(sys.argv)
 

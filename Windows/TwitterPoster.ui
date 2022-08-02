@@ -24,7 +24,7 @@
    </property>
    <property name="styleSheet">
     <string notr="true">QWidget#BackgroundTwitter{
-background-color: rgb(167, 199, 231)
+background-color: rgb(167, 199, 231);
 }</string>
    </property>
    <widget class="QPlainTextEdit" name="PosterTwitter">
