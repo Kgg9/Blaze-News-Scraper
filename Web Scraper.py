@@ -236,6 +236,8 @@ class TwitterPosterWindow(QDialog):
         super(TwitterPosterWindow, self).__init__()
         loadUi('Windows/TwitterPoster.ui',self)
 
+        self.DateTimeEditTwiter.setMinimumDateTime(QDateTime.currentDateTime())
+
         self.DateTimeEditTwiter.hide()
 
         self.QueueTwitterRadioButton.toggled.connect(self.dateTimeCheckTwitt)
@@ -282,6 +284,7 @@ class LinkedinPosterWindow(QDialog):
         super(LinkedinPosterWindow, self).__init__()
         loadUi('Windows/LinkedinPoster.ui', self)
 
+        self.DateTimeEditLinkedin.setMinimumDateTime(QDateTime.currentDateTime())
         self.DateTimeEditLinkedin.hide()
 
         self.QueueLinkedinRadioButton.toggled.connect(self.dateTimecheckLink)
