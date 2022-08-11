@@ -46,6 +46,25 @@ background-color: rgb(167, 199, 231);
       <height>22</height>
      </rect>
     </property>
+    <property name="correctionMode">
+     <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+    </property>
+    <property name="keyboardTracking">
+     <bool>false</bool>
+    </property>
+    <property name="minimumDateTime">
+     <datetime>
+      <hour>22</hour>
+      <minute>21</minute>
+      <second>0</second>
+      <year>2022</year>
+      <month>8</month>
+      <day>10</day>
+     </datetime>
+    </property>
+    <property name="currentSection">
+     <enum>QDateTimeEdit::YearSection</enum>
+    </property>
     <property name="calendarPopup">
      <bool>true</bool>
     </property>

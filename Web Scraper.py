@@ -9,6 +9,8 @@ from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap, QColor
 from PyQt5.QtCore import*
+from apscheduler.schedulers.background import BackgroundScheduler
+from tzlocal import get_localzone
 
 baseUrlGoogle = "https://www.google.com/search?q=&source=lnms&tbm=nws"
 
@@ -22,6 +24,8 @@ headers = ["Title",
 
 linkedinLogin = []
 twitterLogin = []
+
+sched = BackgroundScheduler(timezone = get_localzone())
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -246,6 +250,7 @@ class TwitterPosterWindow(QDialog):
 
         self.TwitterPosterButton.clicked.connect(self.postTwitter)
 
+
     def dateTimeCheckTwitt(self,enabled):
         if enabled:
             self.DateTimeEditTwiter.show()
@@ -257,11 +262,16 @@ class TwitterPosterWindow(QDialog):
         self.TwitterCharacterCounter.setText(f"{characters}/288")
 
     def postTwitter(self):
-        self.twitterPostRun = TwitterPosterMech(self.PosterTwitter.toPlainText())
+        if self.QueueTwitterRadioButton.isChecked():
+            self.dateTime24 = self.DateTimeEditTwiter.dateTime().toPyDateTime()
 
-        self.twitterPostRun.start()
+            sched.add_job(self.twitterCompRun,'date',misfire_grace_time=None,run_date=self.dateTime24,id=self.PosterTwitter.toPlainText())
+            sched.start()
 
-        self.twitterPostRun.finished.connect(self.tweetPostRunAfter)
+        else:
+            self.twitterPostRun = TwitterPosterMech(self.PosterTwitter.toPlainText())
+            self.twitterPostRun.start()
+            self.twitterPostRun.finished.connect(self.tweetPostRunAfter)
 
     def tweetPostRunAfter(self):
         self.poster = widget.widget(widget.currentIndex())
@@ -277,6 +287,11 @@ class TwitterPosterWindow(QDialog):
             "background-color:Yellow")
 
         self.close()
+
+    def twitterCompRun(self):
+        self.twitterPostRun = TwitterPosterMech(self.PosterTwitter.toPlainText())
+        self.twitterPostRun.start()
+        self.twitterPostRun.finished.connect(self.tweetPostRunAfter)
 
 
 class LinkedinPosterWindow(QDialog):
@@ -297,11 +312,18 @@ class LinkedinPosterWindow(QDialog):
             self.DateTimeEditLinkedin.hide()
 
     def postLinkedin(self):
+        if self.QueueLinkedinRadioButton.isChecked():
 
-        self.linkPostRun = LinkedinPosterMech(self.PosterLinkedin.toPlainText())
+            self.dateTime24 = self.DateTimeEditLinkedin.dateTime().toPyDateTime()
 
-        self.linkPostRun.start()
-        self.linkPostRun.finished.connect(self.linkPostRunAfter)
+            sched.add_job(self.linkedinCompRun,'date',misfire_grace_time=None,run_date=self.dateTime24,id=self.PosterLinkedin.toPlainText())
+            sched.start()
+
+        else:
+            self.linkPostRun = LinkedinPosterMech(self.PosterLinkedin.toPlainText())
+
+            self.linkPostRun.start()
+            self.linkPostRun.finished.connect(self.linkPostRunAfter)
 
     def linkPostRunAfter(self):
         self.poster = widget.widget(widget.currentIndex())
@@ -317,6 +339,12 @@ class LinkedinPosterWindow(QDialog):
         self.tab.widget(currentTab).cellWidget(currentRow, headers.index("Linkedin")).setStyleSheet("background-color:Yellow")
 
         self.close()
+
+    def linkedinCompRun(self):
+        self.linkPostRun = LinkedinPosterMech(self.PosterLinkedin.toPlainText())
+
+        self.linkPostRun.start()
+        self.linkPostRun.finished.connect(self.linkPostRunAfter)
 
 class searchEngineThread(QThread):
 
