@@ -12,6 +12,8 @@ from PyQt5.QtCore import*
 from apscheduler.schedulers.background import BackgroundScheduler
 from tzlocal import get_localzone
 
+
+
 baseUrlGoogle = "https://www.google.com/search?q=&source=lnms&tbm=nws"
 
 headers = ["Title",
@@ -22,10 +24,21 @@ headers = ["Title",
            "Linkedin",
            ]
 
+queuedHeaders = ["Title",
+                 "Platform",
+                 "Date",
+                 "Time",
+                 "Change",
+                 "Cancel"]
+
+newsArtcilesLoction = []
+queuedArticles = []
+
 linkedinLogin = []
 twitterLogin = []
 
 sched = BackgroundScheduler(timezone = get_localzone())
+sched.start()
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -37,20 +50,25 @@ class MainWindow(QDialog):
         self.ScraperPushButton.clicked.connect(self.ScrapperPage)
         self.PosterPushButton.clicked.connect(self.PosterPage)
         self.AccountsPushButton.clicked.connect(self.AccountsPage)
+        self.QueuedPushButton.clicked.connect(self.QueuedPage)
+
 
     def ScrapperPage(self):
         widget.setFixedSize(scraperWidth,scraperHeight)
-        widget.setCurrentIndex(widget.currentIndex()+1)
+        widget.setCurrentIndex(widget.indexOf(scraperWindow))
 
     def PosterPage(self):
         widget.setFixedSize(posterWidth,posterHeight)
-        widget.setCurrentIndex(widget.currentIndex() + 2)
+        widget.setCurrentIndex(widget.indexOf(posterWindow))
+
+    def QueuedPage(self):
+        widget.setFixedSize(queuedWidth,queuedHeight)
+        widget.setCurrentIndex(widget.indexOf(queued))
 
     def AccountsPage(self):
         widget.setFixedSize(accountsWidth,accountsHeight)
-        widget.setCurrentIndex(widget.currentIndex()+3)
+        widget.setCurrentIndex(widget.indexOf(accounts))
         widget.findChild(QPushButton,'AccountsErrorMessage').hide()
-
 
 class ScraperMainWindow(QDialog):
     def __init__(self):
@@ -70,7 +88,7 @@ class ScraperMainWindow(QDialog):
 
     def mainPage(self, event):
         self.event = widget.setFixedSize(mainWidth,mainHeight)
-        self.event = widget.setCurrentIndex(widget.currentIndex() -1 )
+        self.event = widget.setCurrentIndex(widget.indexOf(mainWindow))
 
     def scrapeButton(self):
 
@@ -105,7 +123,7 @@ class ScraperMainWindow(QDialog):
 
 
     def scrapingFinshed(self, newsArticles, keyword):
-        self.poster = widget.widget(widget.currentIndex()+1)
+        self.poster = widget.widget(widget.indexOf(posterWindow))
         self.tab = self.poster.findChild(QTabWidget,"PosterTab").addTab(self.tableMaker(newsArticles),keyword)
 
     def tableMaker(self, data):
@@ -144,11 +162,11 @@ class ScraperMainWindow(QDialog):
     def posterPage(self):
         self.progressBar.hide()
         widget.setFixedSize(posterWidth, posterHeight)
-        widget.setCurrentIndex(widget.currentIndex() + 1)
+        widget.setCurrentIndex(widget.indexOf(posterWindow))
 
 
     def clearTabs(self):
-        self.poster = widget.widget(widget.currentIndex() + 1)
+        self.poster = widget.widget(widget.indexOf(posterWindow))
         self.tab = self.poster.findChild(QTabWidget, "PosterTab")
 
         totalTabs = self.tab.count()
@@ -158,7 +176,7 @@ class ScraperMainWindow(QDialog):
 
     def posterPageAfter(self):
 
-        self.poster = widget.widget(widget.currentIndex())
+        self.poster = widget.widget(widget.indexOf(posterWindow))
         self.tab = self.poster.findChild(QTabWidget, "PosterTab")
 
         for i in range(self.tab.count()):
@@ -193,8 +211,25 @@ class PosterWindow(QDialog):
 
     def mainPage(self, event):
         self.event = widget.setFixedSize(mainWidth,mainHeight)
-        self.event = widget.setCurrentIndex(widget.currentIndex() - 2)
+        self.event = widget.setCurrentIndex(widget.indexOf(mainWindow))
 
+
+class Queued(QDialog):
+    def __init__(self):
+        super(Queued, self).__init__()
+        loadUi("Windows/QueueWindow.ui",self)
+
+        self.QueueBackArrowLabel.setPixmap(QPixmap('Images/left-arrow.png'))
+
+        self.QueueBackArrowLabel.mousePressEvent = self.mainPage
+
+        self.QueuedTableWidget.setColumnCount(len(queuedHeaders))
+        self.QueuedTableWidget.setHorizontalHeaderLabels(queuedHeaders)
+
+
+    def mainPage(self, event):
+        self.event = widget.setFixedSize(mainWidth, mainHeight)
+        self.event = widget.setCurrentIndex(widget.indexOf(mainWindow))
 
 class Accounts(QDialog):
     def __init__(self):
@@ -209,7 +244,7 @@ class Accounts(QDialog):
 
     def mainPage(self,event):
         self.event = widget.setFixedSize(mainWidth,mainHeight)
-        self.event = widget.setCurrentIndex(widget.currentIndex() - 3)
+        self.event = widget.setCurrentIndex(widget.indexOf(mainWindow))
 
     def linkAccountInfo(self):
         self.AccountsErrorMessage.hide()
@@ -262,36 +297,56 @@ class TwitterPosterWindow(QDialog):
         self.TwitterCharacterCounter.setText(f"{characters}/288")
 
     def postTwitter(self):
-        if self.QueueTwitterRadioButton.isChecked():
-            self.dateTime24 = self.DateTimeEditTwiter.dateTime().toPyDateTime()
 
-            sched.add_job(self.twitterCompRun,'date',misfire_grace_time=None,run_date=self.dateTime24,id=self.PosterTwitter.toPlainText())
-            sched.start()
-
-        else:
-            self.twitterPostRun = TwitterPosterMech(self.PosterTwitter.toPlainText())
-            self.twitterPostRun.start()
-            self.twitterPostRun.finished.connect(self.tweetPostRunAfter)
-
-    def tweetPostRunAfter(self):
-        self.poster = widget.widget(widget.currentIndex())
+        self.poster = widget.widget(widget.indexOf(posterWindow))
         self.tab = self.poster.findChild(QTabWidget, "PosterTab")
 
         currentTab = self.tab.currentIndex()
         currentRow = self.tab.widget(currentTab).currentRow()
 
-        for i in range(len(headers) - 2):
-            self.tab.widget(currentTab).item(currentRow, i).setBackground(QColor("Yellow"))
+        title = self.tab.widget(currentTab).item(currentRow, 0).text()
 
-        self.tab.widget(currentTab).cellWidget(currentRow, headers.index("Twitter")).setStyleSheet(
+        newsArtcilesLoction.append((title, currentTab, currentRow))
+
+        if self.QueueTwitterRadioButton.isChecked():
+            queuedTableMaker(self,"Twitter")
+        else:
+            self.twitterPostRun = TwitterPosterMech(self.PosterTwitter.toPlainText())
+            self.twitterPostRun.start()
+            self.twitterPostRun.finished.connect(lambda: self.tweetPostRunAfter(title))
+
+
+    def tweetPostRunAfter(self,title):
+        self.poster = widget.widget(widget.indexOf(posterWindow))
+        self.tab = self.poster.findChild(QTabWidget, "PosterTab")
+
+        qDate = self.DateTimeEditTwiter.dateTime().toString("yyyy-MM-dd")
+        qTime = self.DateTimeEditTwiter.dateTime().toString("hh:mm ap")
+
+        currentTab = [tups[1] for tups in newsArtcilesLoction if tups[0]==title]
+        currentRow = [tups[2] for tups in newsArtcilesLoction if tups[0]==title]
+
+        for tuple in queuedArticles:
+            if (tuple[0] == title and tuple[2] == qDate and tuple[3] == qTime):
+
+                self.queued = widget.widget(widget.indexOf(queued))
+                self.qTable = self.queued.findChild(QTableWidget, "QueuedTableWidget")
+
+                for i in range(len(queuedHeaders)):
+                    self.qTable.item(tuple[1],i).setBackground(QColor("#bbeebb"))
+
+        for i in range(len(headers) - 2):
+            self.tab.widget(currentTab[0]).item(currentRow[0], i).setBackground(QColor("Yellow"))
+
+        self.tab.widget(currentTab[0]).cellWidget(currentRow[0], headers.index("Twitter")).setStyleSheet(
             "background-color:Yellow")
 
-        self.close()
+        # self.close()
 
-    def twitterCompRun(self):
+    def twitterCompRun(self,title):
         self.twitterPostRun = TwitterPosterMech(self.PosterTwitter.toPlainText())
         self.twitterPostRun.start()
-        self.twitterPostRun.finished.connect(self.tweetPostRunAfter)
+        self.tweetPostRunAfter(title)
 
 
 class LinkedinPosterWindow(QDialog):
@@ -312,39 +367,58 @@ class LinkedinPosterWindow(QDialog):
             self.DateTimeEditLinkedin.hide()
 
     def postLinkedin(self):
-        if self.QueueLinkedinRadioButton.isChecked():
 
-            self.dateTime24 = self.DateTimeEditLinkedin.dateTime().toPyDateTime()
-
-            sched.add_job(self.linkedinCompRun,'date',misfire_grace_time=None,run_date=self.dateTime24,id=self.PosterLinkedin.toPlainText())
-            sched.start()
-
-        else:
-            self.linkPostRun = LinkedinPosterMech(self.PosterLinkedin.toPlainText())
-
-            self.linkPostRun.start()
-            self.linkPostRun.finished.connect(self.linkPostRunAfter)
-
-    def linkPostRunAfter(self):
-        self.poster = widget.widget(widget.currentIndex())
+        self.poster = widget.widget(widget.indexOf(posterWindow))
         self.tab = self.poster.findChild(QTabWidget, "PosterTab")
-
 
         currentTab = self.tab.currentIndex()
         currentRow = self.tab.widget(currentTab).currentRow()
 
-        for i in range(len(headers)-2):
-            self.tab.widget(currentTab).item(currentRow,i).setBackground(QColor("Yellow"))
+        title = self.tab.widget(currentTab).item(currentRow, 0).text()
 
-        self.tab.widget(currentTab).cellWidget(currentRow, headers.index("Linkedin")).setStyleSheet("background-color:Yellow")
+        newsArtcilesLoction.append((title, currentTab, currentRow))
 
-        self.close()
+        if self.QueueLinkedinRadioButton.isChecked():
+           queuedTableMaker(self,"Linkedin")
+        else:
+            self.linkPostRun = LinkedinPosterMech(self.PosterLinkedin.toPlainText())
 
-    def linkedinCompRun(self):
+            self.linkPostRun.start()
+            self.linkPostRun.finished.connect(lambda: self.linkPostRunAfter(title))
+
+    def linkPostRunAfter(self,title):
+        self.poster = widget.widget(widget.indexOf(posterWindow))
+        self.tab = self.poster.findChild(QTabWidget, "PosterTab")
+
+        qDate = self.DateTimeEditLinkedin.dateTime().toString("yyyy-MM-dd")
+        qTime = self.DateTimeEditLinkedin.dateTime().toString("hh:mm ap")
+
+        currentTab = [tups[1] for tups in newsArtcilesLoction if tups[0] == title]
+        currentRow = [tups[2] for tups in newsArtcilesLoction if tups[0] == title]
+
+        for tuple in queuedArticles:
+            if (tuple[0] == title and tuple[2] == qDate and tuple[3] == qTime):
+
+                self.queued = widget.widget(widget.indexOf(queued))
+                self.qTable = self.queued.findChild(QTableWidget, "QueuedTableWidget")
+
+                for i in range(len(queuedHeaders)):
+                    self.qTable.item(tuple[1], i).setBackground(QColor("#bbeebb"))
+
+        for i in range(len(headers) - 2):
+            self.tab.widget(currentTab[0]).item(currentRow[0], i).setBackground(QColor("Yellow"))
+
+        self.tab.widget(currentTab[0]).cellWidget(currentRow[0], headers.index("Linkedin")).setStyleSheet(
+            "background-color:Yellow")
+
+        # self.close()
+
+    def linkedinCompRun(self,title):
         self.linkPostRun = LinkedinPosterMech(self.PosterLinkedin.toPlainText())
 
         self.linkPostRun.start()
-        self.linkPostRun.finished.connect(self.linkPostRunAfter)
+        self.linkPostRunAfter(title)
+
 
 class searchEngineThread(QThread):
 
@@ -388,6 +462,53 @@ class TwitterPosterMech(QThread):
         tweetPost = TwitterAccountPost(self.username,self.password,self.textData)
         tweetPost.postTweet()
 
+def queuedTableMaker(self, type):
+    self.datetime24,qDate,qTime,title,run = "","","","",""
+
+    if type=='Twitter':
+        self.dateTime24 = self.DateTimeEditTwiter.dateTime().toPyDateTime()
+
+        qDate = self.DateTimeEditTwiter.dateTime().toString("yyyy-MM-dd")
+        qTime = self.DateTimeEditTwiter.dateTime().toString("hh:mm ap")
+
+        title = self.PosterTwitter.toPlainText()
+        title = title.split('\n')[0]
+
+        run = self.twitterCompRun
+
+    if type == "Linkedin":
+        self.dateTime24 = self.DateTimeEditLinkedin.dateTime().toPyDateTime()
+
+        qDate = self.DateTimeEditLinkedin.dateTime().toString("yyyy-MM-dd")
+        qTime = self.DateTimeEditLinkedin.dateTime().toString("hh:mm ap")
+
+        title = self.PosterLinkedin.toPlainText()
+        title = title.split('\n')[0]
+
+        run = self.linkedinCompRun
+
+
+    sched.add_job(run, 'date', args=[title],misfire_grace_time=60, run_date=self.dateTime24, id=title)
+
+
+    self.queued = widget.widget(widget.indexOf(queued))
+    self.qTable = self.queued.findChild(QTableWidget, "QueuedTableWidget")
+
+    rowPosition = self.qTable.rowCount()
+    queuedArticles.append((title,rowPosition,qDate,qTime))
+
+    self.qTable.insertRow(rowPosition)
+
+    self.qTable.setItem(rowPosition, 0, QTableWidgetItem(title))
+    self.qTable.setItem(rowPosition, 1, QTableWidgetItem(type))
+    self.qTable.setItem(rowPosition, 2, QTableWidgetItem(qDate))
+    self.qTable.setItem(rowPosition, 3, QTableWidgetItem(qTime))
+    self.qTable.setItem(rowPosition, 4, QTableWidgetItem("Change"))
+    self.qTable.setItem(rowPosition, 5, QTableWidgetItem("Cancel"))
+
+    self.qTable.resizeColumnsToContents()
+
+
 app = QApplication(sys.argv)
 
 widget = QtWidgets.QStackedWidget()
@@ -396,11 +517,14 @@ mainWindow = MainWindow()
 scraperWindow = ScraperMainWindow()
 posterWindow = PosterWindow()
 accounts = Accounts()
+queued = Queued()
 
 widget.addWidget(mainWindow)
 widget.addWidget(scraperWindow)
 widget.addWidget(posterWindow)
+widget.addWidget(queued)
 widget.addWidget(accounts)
+
 
 mainWidth = mainWindow.width()
 mainHeight = mainWindow.height()
@@ -413,6 +537,9 @@ posterHeight = posterWindow.height()
 
 accountsWidth = accounts.width()
 accountsHeight = accounts.height()
+
+queuedWidth = queued.width()
+queuedHeight = queued.height()
 
 widget.setFixedSize(mainWidth,mainHeight)
 
