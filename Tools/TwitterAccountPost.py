@@ -38,5 +38,5 @@ class TwitterAccountPost():
         tweetBox.send_keys(self.textData)
         sleep(0.5)
 
-        self.driver.find_element(By.XPATH,'/html/body/div[3]/div[2]/div[1]/div/div/div/div/div/div[12]/div/div/button').click()
-        sleep(5)
+        # self.driver.find_element(By.XPATH,'/html/body/div[3]/div[2]/div[1]/div/div/div/div/div/div[12]/div/div/button').click()
+        # sleep(5)

@@ -28,14 +28,13 @@ queuedHeaders = ["Title",
                  "Platform",
                  "Date",
                  "Time",
-                 "Change",
                  "Cancel"]
 
 newsArtcilesLoction = []
 queuedArticles = []
 
-linkedinLogin = []
-twitterLogin = []
+linkedinLogin = ['Silverfrost8@gmail.com','AwAw!234','https://www.linkedin.com/company/35598172/admin/']
+twitterLogin = ['Kartikeyg910','AwAw!@#$']
 
 sched = BackgroundScheduler(timezone = get_localzone())
 sched.start()
@@ -226,6 +225,29 @@ class Queued(QDialog):
         self.QueuedTableWidget.setColumnCount(len(queuedHeaders))
         self.QueuedTableWidget.setHorizontalHeaderLabels(queuedHeaders)
 
+        self.QueuedTableWidget.cellClicked.connect(self.queueCancel)
+
+    def queueCancel(self,row,column):
+        item = self.QueuedTableWidget.cellWidget(row,column)
+        color = item.palette().color(QtGui.QPalette.Background).name()
+
+        if column == queuedHeaders.index("Cancel") and color!='#a8a8a8':
+
+            title = self.QueuedTableWidget.item(row,queuedHeaders.index("Title")).text()
+            platform = self.QueuedTableWidget.item(row,queuedHeaders.index("Platform")).text()
+            date = self.QueuedTableWidget.item(row,queuedHeaders.index("Date")).text()
+            time = self.QueuedTableWidget.item(row,queuedHeaders.index("Time")).text()
+
+            jobId = queuedArticles.index((title,row,date,time,platform))
+
+            print(queuedArticles)
+
+            sched.remove_job(str(jobId))
+
+            self.QueuedTableWidget.hideRow(row)
+
+
+
 
     def mainPage(self, event):
         self.event = widget.setFixedSize(mainWidth, mainHeight)
@@ -321,19 +343,23 @@ class TwitterPosterWindow(QDialog):
         self.tab = self.poster.findChild(QTabWidget, "PosterTab")
 
         qDate = self.DateTimeEditTwiter.dateTime().toString("yyyy-MM-dd")
-        qTime = self.DateTimeEditTwiter.dateTime().toString("hh:mm ap")
+        qTime = self.DateTimeEditTwiter.dateTime().toString("hh:mm:00 ap")
 
         currentTab = [tups[1] for tups in newsArtcilesLoction if tups[0]==title]
         currentRow = [tups[2] for tups in newsArtcilesLoction if tups[0]==title]
 
         for tuple in queuedArticles:
-            if (tuple[0] == title and tuple[2] == qDate and tuple[3] == qTime):
+            if (tuple[0] == title and tuple[2] == qDate and tuple[3] == qTime and tuple[4]=="Twitter"):
 
                 self.queued = widget.widget(widget.indexOf(queued))
                 self.qTable = self.queued.findChild(QTableWidget, "QueuedTableWidget")
 
-                for i in range(len(queuedHeaders)):
+                for i in range(len(queuedHeaders)-1):
                     self.qTable.item(tuple[1],i).setBackground(QColor("#bbeebb"))
+
+                self.qTable.cellWidget(tuple[1], queuedHeaders.index("Cancel")).setStyleSheet(
+                    "background-color:#A8A8A8")
+
 
         for i in range(len(headers) - 2):
             self.tab.widget(currentTab[0]).item(currentRow[0], i).setBackground(QColor("Yellow"))
@@ -391,19 +417,22 @@ class LinkedinPosterWindow(QDialog):
         self.tab = self.poster.findChild(QTabWidget, "PosterTab")
 
         qDate = self.DateTimeEditLinkedin.dateTime().toString("yyyy-MM-dd")
-        qTime = self.DateTimeEditLinkedin.dateTime().toString("hh:mm ap")
+        qTime = self.DateTimeEditLinkedin.dateTime().toString("hh:mm:00 ap")
 
         currentTab = [tups[1] for tups in newsArtcilesLoction if tups[0] == title]
         currentRow = [tups[2] for tups in newsArtcilesLoction if tups[0] == title]
 
         for tuple in queuedArticles:
-            if (tuple[0] == title and tuple[2] == qDate and tuple[3] == qTime):
+            if (tuple[0] == title and tuple[2] == qDate and tuple[3] == qTime and tuple[4] == "Linkedin"):
 
                 self.queued = widget.widget(widget.indexOf(queued))
                 self.qTable = self.queued.findChild(QTableWidget, "QueuedTableWidget")
 
-                for i in range(len(queuedHeaders)):
+                for i in range(len(queuedHeaders) - 1):
                     self.qTable.item(tuple[1], i).setBackground(QColor("#bbeebb"))
+
+                self.qTable.cellWidget(tuple[1], queuedHeaders.index("Cancel")).setStyleSheet(
+                    "background-color:#A8A8A8")
 
         for i in range(len(headers) - 2):
             self.tab.widget(currentTab[0]).item(currentRow[0], i).setBackground(QColor("Yellow"))
@@ -469,7 +498,8 @@ def queuedTableMaker(self, type):
         self.dateTime24 = self.DateTimeEditTwiter.dateTime().toPyDateTime()
 
         qDate = self.DateTimeEditTwiter.dateTime().toString("yyyy-MM-dd")
-        qTime = self.DateTimeEditTwiter.dateTime().toString("hh:mm ap")
+        qTime = self.DateTimeEditTwiter.dateTime().toString("hh:mm:00 ap")
+
 
         title = self.PosterTwitter.toPlainText()
         title = title.split('\n')[0]
@@ -480,22 +510,30 @@ def queuedTableMaker(self, type):
         self.dateTime24 = self.DateTimeEditLinkedin.dateTime().toPyDateTime()
 
         qDate = self.DateTimeEditLinkedin.dateTime().toString("yyyy-MM-dd")
-        qTime = self.DateTimeEditLinkedin.dateTime().toString("hh:mm ap")
+        qTime = self.DateTimeEditLinkedin.dateTime().toString("hh:mm:00 ap")
 
         title = self.PosterLinkedin.toPlainText()
         title = title.split('\n')[0]
 
         run = self.linkedinCompRun
 
-
-    sched.add_job(run, 'date', args=[title],misfire_grace_time=60, run_date=self.dateTime24, id=title)
-
-
     self.queued = widget.widget(widget.indexOf(queued))
     self.qTable = self.queued.findChild(QTableWidget, "QueuedTableWidget")
 
     rowPosition = self.qTable.rowCount()
-    queuedArticles.append((title,rowPosition,qDate,qTime))
+    queuedArticles.append((title, rowPosition, qDate, qTime,type))
+
+    sched.add_job(run, 'date', args=[title],misfire_grace_time=60, run_date=self.dateTime24, id=str(queuedArticles.index((title, rowPosition, qDate, qTime,type))))
+
+    changePixmap = QPixmap("Images/schedule.png")
+    change = QLabel()
+    change.setPixmap(changePixmap)
+    change.setAlignment(Qt.AlignCenter)
+
+    cancelPixmap = QPixmap("Images/cancel.png")
+    cancel = QLabel()
+    cancel.setPixmap(cancelPixmap)
+    cancel.setAlignment(Qt.AlignCenter)
 
     self.qTable.insertRow(rowPosition)
 
@@ -503,8 +541,7 @@ def queuedTableMaker(self, type):
     self.qTable.setItem(rowPosition, 1, QTableWidgetItem(type))
     self.qTable.setItem(rowPosition, 2, QTableWidgetItem(qDate))
     self.qTable.setItem(rowPosition, 3, QTableWidgetItem(qTime))
-    self.qTable.setItem(rowPosition, 4, QTableWidgetItem("Change"))
-    self.qTable.setItem(rowPosition, 5, QTableWidgetItem("Cancel"))
+    self.qTable.setCellWidget(rowPosition, 4, cancel)
 
     self.qTable.resizeColumnsToContents()
 

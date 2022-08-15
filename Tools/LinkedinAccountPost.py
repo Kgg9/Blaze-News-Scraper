@@ -41,9 +41,8 @@ class LinkedinAccountPoster():
 
         sleep(2)
 
-        self.driver.find_element(By.XPATH, "//button[contains(@class, 'share-actions__primary-action artdeco-button artdeco-button--2 artdeco-button--primary ember-view') and contains(., 'Post')]").click()
+        # self.driver.find_element(By.XPATH, "//button[contains(@class, 'share-actions__primary-action artdeco-button artdeco-button--2 artdeco-button--primary ember-view') and contains(., 'Post')]").click()
 
     def linkedinRun(self):
         self.login()
         self.postCompanyPage()
-
