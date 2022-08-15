@@ -33,8 +33,8 @@ queuedHeaders = ["Title",
 newsArtcilesLoction = []
 queuedArticles = []
 
-linkedinLogin = ['Silverfrost8@gmail.com','AwAw!234','https://www.linkedin.com/company/35598172/admin/']
-twitterLogin = ['Kartikeyg910','AwAw!@#$']
+linkedinLogin = []
+twitterLogin = []
 
 sched = BackgroundScheduler(timezone = get_localzone())
 sched.start()
@@ -245,8 +245,6 @@ class Queued(QDialog):
             sched.remove_job(str(jobId))
 
             self.QueuedTableWidget.hideRow(row)
-
-
 
 
     def mainPage(self, event):
