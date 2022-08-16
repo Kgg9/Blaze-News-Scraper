@@ -1,12 +1,11 @@
 # Imports needed to make the project run
 import sys
 from time import sleep
-
 from SearchEngines.Google import Google
 from Tools.LinkedinAccountPost import LinkedinAccountPoster
 from Tools.TwitterAccountPost import TwitterAccountPost
 from Tools.GetCSV import csv_File_Name
-import Images
+from traceback import format_exception
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import *
@@ -35,8 +34,8 @@ queuedHeaders = ["Title",
 newsArticlesLoction = []
 queuedArticles = []
 
-linkedinLogin = ['Silverfrost8@gmail.com','AwAw!234','https://www.linkedin.com/company/35598172/admin/']
-twitterLogin = ['Kartikeyg910','AwAw!@#$']
+linkedinLogin = []
+twitterLogin = []
 
 sched = QtScheduler(timezone = get_localzone())
 sched.start()
@@ -484,9 +483,10 @@ class TwitterPosterMech(QThread):
 
 
 def queuedTableMaker(self, type):
+
     self.datetime24,qDate,qTime,title,run = "","","","",""
 
-    if type=='Twitter':
+    if type=='Twitter' and len(twitterLogin)!=0:
         self.dateTime24 = self.DateTimeEditTwiter.dateTime().toPyDateTime()
 
         qDate = self.DateTimeEditTwiter.dateTime().toString("yyyy-MM-dd")
@@ -498,7 +498,7 @@ def queuedTableMaker(self, type):
 
         run = self.twitterCompRun
 
-    if type == "Linkedin":
+    if type == "Linkedin" and len(linkedinLogin)!=0:
         self.dateTime24 = self.DateTimeEditLinkedin.dateTime().toPyDateTime()
 
         qDate = self.DateTimeEditLinkedin.dateTime().toString("yyyy-MM-dd")
@@ -540,44 +540,49 @@ def queuedTableMaker(self, type):
 
     self.qTable.resizeColumnsToContents()
 
+def catch_exceptions(t, val, tb):
+    errors = format_exception(t, val, tb)
+    with open('ErrorLog.txt','w') as f:
+        for i in errors:
+            f.write(i)
 
-app = QApplication(sys.argv)
+old_hook = sys.excepthook
+sys.excepthook = catch_exceptions
 
-widget = QtWidgets.QStackedWidget()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
 
-mainWindow = MainWindow()
-scraperWindow = ScraperMainWindow()
-posterWindow = PosterWindow()
-accounts = Accounts()
-queued = Queued()
+    widget = QtWidgets.QStackedWidget()
 
-widget.addWidget(mainWindow)
-widget.addWidget(scraperWindow)
-widget.addWidget(posterWindow)
-widget.addWidget(queued)
-widget.addWidget(accounts)
+    mainWindow = MainWindow()
+    scraperWindow = ScraperMainWindow()
+    posterWindow = PosterWindow()
+    accounts = Accounts()
+    queued = Queued()
 
+    widget.addWidget(mainWindow)
+    widget.addWidget(scraperWindow)
+    widget.addWidget(posterWindow)
+    widget.addWidget(queued)
+    widget.addWidget(accounts)
 
-mainWidth = mainWindow.width()
-mainHeight = mainWindow.height()
+    mainWidth = mainWindow.width()
+    mainHeight = mainWindow.height()
 
-scraperWidth = scraperWindow.width()
-scraperHeight = scraperWindow.height()
+    scraperWidth = scraperWindow.width()
+    scraperHeight = scraperWindow.height()
 
-posterWidth = posterWindow.width()
-posterHeight = posterWindow.height()
+    posterWidth = posterWindow.width()
+    posterHeight = posterWindow.height()
 
-accountsWidth = accounts.width()
-accountsHeight = accounts.height()
+    accountsWidth = accounts.width()
+    accountsHeight = accounts.height()
 
-queuedWidth = queued.width()
-queuedHeight = queued.height()
+    queuedWidth = queued.width()
+    queuedHeight = queued.height()
 
-widget.setFixedSize(mainWidth,mainHeight)
+    widget.setFixedSize(mainWidth, mainHeight)
 
-widget.show()
+    widget.show()
 
-try:
     sys.exit(app.exec())
-except:
-    print("exit")
