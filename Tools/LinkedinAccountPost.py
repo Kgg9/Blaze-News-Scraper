@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 from time import sleep
 
 class LinkedinAccountPoster():
@@ -13,7 +14,14 @@ class LinkedinAccountPoster():
         self.password = password
         self.companyPageUrl = companyPageUrl
         self.postData = postData
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
+        self.options = Options()
+        self.options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        self.options.headless = True
+
+        self.options.add_argument("--window-size=1920,1080")
+
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=self.options)
 
     def login(self):
         self.driver.get('https://www.linkedin.com/home/?originalSubdomain=ca')
@@ -41,7 +49,7 @@ class LinkedinAccountPoster():
 
         sleep(2)
 
-        # self.driver.find_element(By.XPATH, "//button[contains(@class, 'share-actions__primary-action artdeco-button artdeco-button--2 artdeco-button--primary ember-view') and contains(., 'Post')]").click()
+        self.driver.find_element(By.XPATH, "//button[contains(@class, 'share-actions__primary-action artdeco-button artdeco-button--2 artdeco-button--primary ember-view') and contains(., 'Post')]").click()
 
     def linkedinRun(self):
         self.login()

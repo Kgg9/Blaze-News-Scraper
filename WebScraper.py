@@ -1,17 +1,19 @@
 # Imports needed to make the project run
 import sys
+from time import sleep
+
 from SearchEngines.Google import Google
 from Tools.LinkedinAccountPost import LinkedinAccountPoster
 from Tools.TwitterAccountPost import TwitterAccountPost
+from Tools.GetCSV import csv_File_Name
 import Images
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap, QColor
 from PyQt5.QtCore import*
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.qt import QtScheduler
 from tzlocal import get_localzone
-
 
 
 baseUrlGoogle = "https://www.google.com/search?q=&source=lnms&tbm=nws"
@@ -30,13 +32,13 @@ queuedHeaders = ["Title",
                  "Time",
                  "Cancel"]
 
-newsArtcilesLoction = []
+newsArticlesLoction = []
 queuedArticles = []
 
-linkedinLogin = []
-twitterLogin = []
+linkedinLogin = ['Silverfrost8@gmail.com','AwAw!234','https://www.linkedin.com/company/35598172/admin/']
+twitterLogin = ['Kartikeyg910','AwAw!@#$']
 
-sched = BackgroundScheduler(timezone = get_localzone())
+sched = QtScheduler(timezone = get_localzone())
 sched.start()
 
 class MainWindow(QDialog):
@@ -97,8 +99,6 @@ class ScraperMainWindow(QDialog):
             self.ScraperErrorMessage.hide()
             self.progressBar.show()
 
-            self.clearTabs()
-
             keywords = self.ScrapeLineEdit.text().split(',')
             pages = self.ScraperSpinBox.value()
             time = self.ScrapeDropDownMenu.currentText()
@@ -121,9 +121,9 @@ class ScraperMainWindow(QDialog):
 
 
 
-    def scrapingFinshed(self, newsArticles, keyword):
+    def scrapingFinshed(self, newsArticles, keyword,time):
         self.poster = widget.widget(widget.indexOf(posterWindow))
-        self.tab = self.poster.findChild(QTabWidget,"PosterTab").addTab(self.tableMaker(newsArticles),keyword)
+        self.tab = self.poster.findChild(QTabWidget,"PosterTab").addTab(self.tableMaker(newsArticles),csv_File_Name(keyword,time))
 
     def tableMaker(self, data):
         self.data = [tup for group in data for tup in group]
@@ -163,16 +163,6 @@ class ScraperMainWindow(QDialog):
         widget.setFixedSize(posterWidth, posterHeight)
         widget.setCurrentIndex(widget.indexOf(posterWindow))
 
-
-    def clearTabs(self):
-        self.poster = widget.widget(widget.indexOf(posterWindow))
-        self.tab = self.poster.findChild(QTabWidget, "PosterTab")
-
-        totalTabs = self.tab.count()
-
-        for i in range(totalTabs):
-            self.tab.removeTab(0)
-
     def posterPageAfter(self):
 
         self.poster = widget.widget(widget.indexOf(posterWindow))
@@ -207,6 +197,8 @@ class PosterWindow(QDialog):
 
         self.PosterBackArrowLabel.mousePressEvent = self.mainPage
 
+        self.PosterTab.tabCloseRequested.connect(lambda index: self.PosterTab.removeTab(index))
+
 
     def mainPage(self, event):
         self.event = widget.setFixedSize(mainWidth,mainHeight)
@@ -239,8 +231,6 @@ class Queued(QDialog):
             time = self.QueuedTableWidget.item(row,queuedHeaders.index("Time")).text()
 
             jobId = queuedArticles.index((title,row,date,time,platform))
-
-            print(queuedArticles)
 
             sched.remove_job(str(jobId))
 
@@ -326,7 +316,7 @@ class TwitterPosterWindow(QDialog):
 
         title = self.tab.widget(currentTab).item(currentRow, 0).text()
 
-        newsArtcilesLoction.append((title, currentTab, currentRow))
+        newsArticlesLoction.append((title, currentTab, currentRow))
 
         if self.QueueTwitterRadioButton.isChecked():
             queuedTableMaker(self,"Twitter")
@@ -343,8 +333,8 @@ class TwitterPosterWindow(QDialog):
         qDate = self.DateTimeEditTwiter.dateTime().toString("yyyy-MM-dd")
         qTime = self.DateTimeEditTwiter.dateTime().toString("hh:mm:00 ap")
 
-        currentTab = [tups[1] for tups in newsArtcilesLoction if tups[0]==title]
-        currentRow = [tups[2] for tups in newsArtcilesLoction if tups[0]==title]
+        currentTab = [tups[1] for tups in newsArticlesLoction if tups[0]==title]
+        currentRow = [tups[2] for tups in newsArticlesLoction if tups[0]==title]
 
         for tuple in queuedArticles:
             if (tuple[0] == title and tuple[2] == qDate and tuple[3] == qTime and tuple[4]=="Twitter"):
@@ -365,11 +355,10 @@ class TwitterPosterWindow(QDialog):
         self.tab.widget(currentTab[0]).cellWidget(currentRow[0], headers.index("Twitter")).setStyleSheet(
             "background-color:Yellow")
 
-        # self.close()
-
     def twitterCompRun(self,title):
         self.twitterPostRun = TwitterPosterMech(self.PosterTwitter.toPlainText())
         self.twitterPostRun.start()
+        sleep(15)
         self.tweetPostRunAfter(title)
 
 
@@ -400,7 +389,7 @@ class LinkedinPosterWindow(QDialog):
 
         title = self.tab.widget(currentTab).item(currentRow, 0).text()
 
-        newsArtcilesLoction.append((title, currentTab, currentRow))
+        newsArticlesLoction.append((title, currentTab, currentRow))
 
         if self.QueueLinkedinRadioButton.isChecked():
            queuedTableMaker(self,"Linkedin")
@@ -417,8 +406,8 @@ class LinkedinPosterWindow(QDialog):
         qDate = self.DateTimeEditLinkedin.dateTime().toString("yyyy-MM-dd")
         qTime = self.DateTimeEditLinkedin.dateTime().toString("hh:mm:00 ap")
 
-        currentTab = [tups[1] for tups in newsArtcilesLoction if tups[0] == title]
-        currentRow = [tups[2] for tups in newsArtcilesLoction if tups[0] == title]
+        currentTab = [tups[1] for tups in newsArticlesLoction if tups[0] == title]
+        currentRow = [tups[2] for tups in newsArticlesLoction if tups[0] == title]
 
         for tuple in queuedArticles:
             if (tuple[0] == title and tuple[2] == qDate and tuple[3] == qTime and tuple[4] == "Linkedin"):
@@ -442,8 +431,8 @@ class LinkedinPosterWindow(QDialog):
 
     def linkedinCompRun(self,title):
         self.linkPostRun = LinkedinPosterMech(self.PosterLinkedin.toPlainText())
-
         self.linkPostRun.start()
+        sleep(19)
         self.linkPostRunAfter(title)
 
 
@@ -453,14 +442,14 @@ class searchEngineThread(QThread):
     pages = pyqtSignal(str)
     time = pyqtSignal(str)
     baseurl = pyqtSignal(str)
-    data = pyqtSignal(list, str)
+    data = pyqtSignal(list, str,str)
     ThreadActive = pyqtSignal(bool)
 
     def run(self):
         for keyword in self.keywords:
             googleSE = Google(self.time, keyword, self.pages, self.baseurl)
             googleSE = googleSE.Start()
-            self.data.emit(googleSE, keyword)
+            self.data.emit(googleSE, keyword,self.time)
         self.ThreadActive.emit(False)
 
 class LinkedinPosterMech(QThread):
@@ -478,6 +467,9 @@ class LinkedinPosterMech(QThread):
         linkPost.linkedinRun()
 
 class TwitterPosterMech(QThread):
+
+    ThreadActive = pyqtSignal(bool)
+
     def __init__(self, textData):
         super().__init__()
 
@@ -486,8 +478,10 @@ class TwitterPosterMech(QThread):
         self.textData = textData
 
     def run(self):
+        self.ThreadActive.emit(False)
         tweetPost = TwitterAccountPost(self.username,self.password,self.textData)
         tweetPost.postTweet()
+
 
 def queuedTableMaker(self, type):
     self.datetime24,qDate,qTime,title,run = "","","","",""
@@ -521,7 +515,10 @@ def queuedTableMaker(self, type):
     rowPosition = self.qTable.rowCount()
     queuedArticles.append((title, rowPosition, qDate, qTime,type))
 
+    self.dateTime24 = self.dateTime24.replace(second=0, microsecond=0)
+
     sched.add_job(run, 'date', args=[title],misfire_grace_time=60, run_date=self.dateTime24, id=str(queuedArticles.index((title, rowPosition, qDate, qTime,type))))
+
 
     changePixmap = QPixmap("Images/schedule.png")
     change = QLabel()

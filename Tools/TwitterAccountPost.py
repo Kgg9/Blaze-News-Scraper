@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 from time import sleep
 
 class TwitterAccountPost():
@@ -13,7 +14,12 @@ class TwitterAccountPost():
         self.username = username
         self.password = password
         self.textData = textData
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
+        self.options = Options()
+        self.options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        self.options.headless = True
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=self.options)
+
 
     def postTweet(self):
         self.driver.get('https://tweetdeck.twitter.com/')
@@ -38,5 +44,5 @@ class TwitterAccountPost():
         tweetBox.send_keys(self.textData)
         sleep(0.5)
 
-        # self.driver.find_element(By.XPATH,'/html/body/div[3]/div[2]/div[1]/div/div/div/div/div/div[12]/div/div/button').click()
-        # sleep(5)
+        self.driver.find_element(By.XPATH,'/html/body/div[3]/div[2]/div[1]/div/div/div/div/div/div[12]/div/div/button').click()
+        sleep(2)

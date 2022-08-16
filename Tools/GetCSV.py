@@ -9,17 +9,17 @@ def csv_File_Name(keyword,time):
     date_today = datetime.today()
 
     if time == "Past hour":
-        file_name = f"{keyword} articles from {(date_today - timedelta(hours=1)).strftime('%Y-%m-%d %H.%M')} to {date_today.strftime('%Y-%m-%d %H.%M')}.csv"
+        file_name = f"{keyword} Articles From {(date_today - timedelta(hours=1)).strftime('%Y-%m-%d %I:%M %p')} To {date_today.strftime('%Y-%m-%d %I:%M %p')}"
     elif time == "Past 24 hours":
-        file_name = f"{keyword} articles from {(date_today - timedelta(days=1)).strftime('%Y-%m-%d %H.%M')} to {date_today.strftime('%Y-%m-%d %H.%M')}.csv"
+        file_name = f"{keyword} Articles From {(date_today - timedelta(days=1)).strftime('%Y-%m-%d %I:%M %p')} To {date_today.strftime('%Y-%m-%d %I:%M %p')}"
     elif time == "Past week":
-        file_name = f"{keyword} articles from {(date_today - timedelta(days=7)).strftime('%Y-%m-%d %H.%M')} to {date_today.strftime('%Y-%m-%d %H.%M')}.csv"
+        file_name = f"{keyword} Articles From {(date_today - timedelta(days=7)).strftime('%Y-%m-%d %I:%M %p')} To {date_today.strftime('%Y-%m-%d %I:%M %p')}"
     elif time == "Past month":
-        file_name = f"{keyword} articles from {(date_today - relativedelta(months=1)).strftime('%Y-%m-%d %H.%M')} to {date_today.strftime('%Y-%m-%d %H.%M')}.csv"
+        file_name = f"{keyword} Articles From {(date_today - relativedelta(months=1)).strftime('%Y-%m-%d %I:%M %p')} To {date_today.strftime('%Y-%m-%d %I:%M %p')}v"
     elif time == "Past year":
-        file_name = f"{keyword} articles from {(date_today - relativedelta(years=1)).strftime('%Y-%m-%d %H.%M')} to {date_today.strftime('%Y-%m-%d %H.%M')}.csv"
+        file_name = f"{keyword} Articles From {(date_today - relativedelta(years=1)).strftime('%Y-%m-%d %I:%M %p')} To {date_today.strftime('%Y-%m-%d %I:%M %p')}"
     else:
-        file_name = f"{keyword} articles from {date_today.strftime('%Y-%m-%d %H.%M')} to no specified date and time.csv"
+        file_name = f"{keyword} Articles From {date_today.strftime('%Y-%m-%d %I:%M %p')} To No Specified Date And Time"
 
     return file_name
 

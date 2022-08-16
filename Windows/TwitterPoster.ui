@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Twitter Poster</string>
   </property>
   <widget class="QWidget" name="BackgroundTwitter" native="true">
    <property name="geometry">

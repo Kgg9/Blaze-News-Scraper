@@ -8,6 +8,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from time import sleep
 
 class Google():
@@ -16,7 +17,10 @@ class Google():
         self.keyword = keyword
         self.pages = pages
         self.base_url = base_url
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
+        self.options = Options()
+        self.options.headless = True
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=self.options)
 
     def pre_Scraper(self, url, keyword, time):
 

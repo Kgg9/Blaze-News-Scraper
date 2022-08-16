@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>Blazer</class>
+ <widget class="QWidget" name="Blazer">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Blazer</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -209,12 +209,58 @@ border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(25
      <string>Accounts</string>
     </property>
    </widget>
+   <widget class="QLabel" name="Author">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>730</y>
+      <width>201</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Cascadia Mono Light</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color:white;</string>
+    </property>
+    <property name="text">
+     <string>Made By: Kartikey Garg</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="Version">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>730</y>
+      <width>201</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Cascadia Mono Light</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color:white;</string>
+    </property>
+    <property name="text">
+     <string>Version 1.0</string>
+    </property>
+   </widget>
    <zorder>Title</zorder>
    <zorder>MainWindowLogo</zorder>
    <zorder>PosterPushButton</zorder>
    <zorder>QueuedPushButton</zorder>
    <zorder>AccountsPushButton</zorder>
    <zorder>ScraperPushButton</zorder>
+   <zorder>Author</zorder>
+   <zorder>Version</zorder>
   </widget>
  </widget>
  <resources>
