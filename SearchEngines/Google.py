@@ -20,7 +20,8 @@ class Google():
 
         self.options = Options()
         self.options.headless = True
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=self.options)
+
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=self.options)
 
     def pre_Scraper(self, url, keyword, time):
 
@@ -63,7 +64,7 @@ class Google():
         for article in articles:
             Title = article.find('div', class_='mCBkyc y355M ynAwRc MBeuO nDgy9d').get_text().replace("\n","").replace("...", "")
             Descirption = article.find('div', class_='GI74Re nDgy9d').get_text().replace("\n", "").replace("...", "")
-            Time = article.find('div', class_='OSrXXb ZE0LJd').get_text()
+            Time = article.find('div', class_='OSrXXb ZE0LJd eGGgIf').get_text()
             Link = article.find('a', href=True)['href']
             pageArticles.append((Title, Descirption, Time, Link))
 
@@ -88,6 +89,7 @@ class Google():
                 next_Icon.click()
             except:
                 break
+
         return newsArticles
 
     # Function used to Start the Scraping Process
@@ -96,5 +98,4 @@ class Google():
         basePageUrl = self.pre_Scraper(self.base_url, self.keyword, self.time)
         newsArticles = self.next_Pages(basePageUrl, self.pages)
         return newsArticles
-
 
