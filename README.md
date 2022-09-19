@@ -6,14 +6,14 @@
   Blazer a Locally Run Linkedin and Twitter Post Automation Tool for Scraped News Articles through Google.
 </p>
 
-<h1 align="center">Prerequisites
+<h1 align="center">Prerequisites</h1>
 
 [Google Chrome](https://www.google.com/intl/en_ca/chrome/)
 
 [Chrome WebDriver](https://chromedriver.chromium.org/downloads)
 
 
-<h1 align="center">Download Link
+<h1 align="center">Download Link</h1>
 
 [Blazer Windows Download Link ](Google.com)
 
