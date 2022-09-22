@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  Blazer a Locally Run Linkedin and Twitter Post Automation Tool for Scraped News Articles through Google.
+  Blazer a Locally Run GUI Application for Linkedin and Twitter Post Automation Tool for Scraped News Articles through Google.
 </p>
 
 <h1 align="center">Prerequisites</h1>
